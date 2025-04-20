@@ -7,12 +7,20 @@ export const API_BASE_URL = DEPLOYED
 
 const api = axios.create({
   baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
-const token = localStorage.getItem('jwt');
-
-api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-api.defaults.headers.post['Content-Type'] = 'application/json';
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('jwt');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 export default api;
